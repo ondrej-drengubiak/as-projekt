@@ -1,0 +1,27 @@
+{
+ "theme": "neutral",
+ "themeVariables": {
+  "fontFamily": "DejaVu Sans, Arial, sans-serif",
+  "fontSize": "14px"
+ },
+ "sequence": {
+  "mirrorActors": true,
+  "actorMargin": 18,
+  "messageMargin": 28,
+  "boxMargin": 6,
+  "noteMargin": 10,
+  "width": 112,
+  "useMaxWidth": false,
+  "wrap": true,
+  "wrapPadding": 8,
+  "messageFontSize": 13,
+  "noteFontSize": 12,
+  "actorFontSize": 13
+ },
+ "class": {
+  "useMaxWidth": false
+ },
+ "state": {
+  "useMaxWidth": false
+ }
+}

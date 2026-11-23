@@ -1,0 +1,40 @@
+{
+ "stages": [
+  {
+   "stage": "S0 monolit",
+   "tests": 25,
+   "passed": 25,
+   "transcript_sha": "b92202666359",
+   "failed": []
+  },
+  {
+   "stage": "S1 +Catalog",
+   "tests": 25,
+   "passed": 25,
+   "transcript_sha": "b92202666359",
+   "failed": []
+  },
+  {
+   "stage": "S2 +Inventory",
+   "tests": 25,
+   "passed": 25,
+   "transcript_sha": "b92202666359",
+   "failed": []
+  },
+  {
+   "stage": "S3 +Billing",
+   "tests": 25,
+   "passed": 25,
+   "transcript_sha": "b92202666359",
+   "failed": []
+  },
+  {
+   "stage": "S4 +Ordering",
+   "tests": 25,
+   "passed": 25,
+   "transcript_sha": "b92202666359",
+   "failed": []
+  }
+ ],
+ "all_transcripts_identical": true
+}

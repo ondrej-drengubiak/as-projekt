@@ -1,0 +1,64 @@
+digraph G {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=14, labelloc=t, nodesep=0.2, ranksep=0.6, splines=true, pad=0.25, newrank=true];
+  node [fontname="DejaVu Sans", fontsize=10, style="filled", color="#555555"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#333333"];
+
+  // Motivation (fialová)
+  goal [shape=ellipse, fillcolor="#CCCCFF", label="«Goal»\nSamostatné nasadzovanie\na škálovanie"];
+  req  [shape=parallelogram, fillcolor="#CCCCFF", label="«Requirement»\nRozhranie REST\nsa nesmie zmeniť"];
+
+  // Work packages (svetlozelená)
+  node [shape=box, style="rounded,filled", fillcolor="#C9E7B7"];
+  wp1 [label="«Work Package»\nWP1: Catalog"];
+  wp2 [label="«Work Package»\nWP2: Inventory"];
+  wp3 [label="«Work Package»\nWP3: Billing"];
+  wp4 [label="«Work Package»\nWP4: Ordering"];
+
+  // Deliverables
+  node [shape=note, style="filled", fillcolor="#C9E7B7"];
+  d1 [label="«Deliverable»\ncatalog-service,\ntrasa /products,\nprepínač, prenos dát"];
+  d2 [label="«Deliverable»\ninventory-service,\ntrasa /inventory,\nprepínač, prenos dát"];
+  d3 [label="«Deliverable»\nbilling-service,\nprepínač,\nprenos účtov a platieb"];
+  d4 [label="«Deliverable»\nordering-service (saga),\ntrasy /orders, /reports,\nACL"];
+  dt [label="«Deliverable»\nKontraktové testy\n(25 scenárov)"];
+
+  // Plateaus
+  node [shape=box, style="filled", fillcolor="#C9E7B7", peripheries=2, color="#2E7D32"];
+  p0 [label="«Plateau»\nPlateau 0 (S0)\nmonolit"];
+  p1 [label="«Plateau»\nPlateau 1 (S1)\n+ catalog-service"];
+  p2 [label="«Plateau»\nPlateau 2 (S2)\n+ inventory-service"];
+  p3 [label="«Plateau»\nPlateau 3 (S3)\n+ billing-service"];
+  p4 [label="«Plateau»\nPlateau 4 (S4)\n+ ordering-service"];
+
+  // Gaps
+  node [shape=ellipse, style="filled", fillcolor="#C9E7B7", peripheries=1, color="#555555"];
+  g1 [label="«Gap»\nchýba\ncatalog-service"];
+  g2 [label="«Gap»\nchýba\ninventory-service"];
+  g3 [label="«Gap»\nchýba\nbilling-service"];
+  g4 [label="«Gap»\nchýba\nordering-service"];
+
+  // motivation
+  edge [arrowhead=empty, style=dashed];
+  req -> goal;
+  dt -> req;
+  // work package -> deliverable (realization)
+  wp1 -> d1; wp2 -> d2; wp3 -> d3; wp4 -> d4;
+  // deliverable -> plateau (realization)
+  d1 -> p1; d2 -> p2; d3 -> p3; d4 -> p4;
+  // triggering medzi work packages a plateau
+  edge [arrowhead=normal, style=solid];
+  wp1 -> wp2; wp2 -> wp3; wp3 -> wp4;
+  p0 -> p1; p1 -> p2; p2 -> p3; p3 -> p4;
+  // gap (association)
+  edge [arrowhead=none, style=solid, color="#555555"];
+  p0 -> g1; g1 -> p1; p1 -> g2; g2 -> p2; p2 -> g3; g3 -> p3; p3 -> g4; g4 -> p4;
+
+  {rank=same; goal; req}
+  {rank=same; wp1; wp2; wp3; wp4; dt}
+  {rank=same; d1; d2; d3; d4}
+  {rank=same; p0; p1; p2; p3; p4}
+  {rank=same; g1; g2; g3; g4}
+  legend [shape=plaintext, style="", fontsize=10, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3">
+    <TR><TD ALIGN="LEFT">- - &#9655; realization</TD><TD ALIGN="LEFT">&#8212;&#9654; triggering</TD><TD ALIGN="LEFT">&#8212; association (gap medzi plateau)</TD></TR></TABLE>>];
+  {rank=sink; legend}
+}

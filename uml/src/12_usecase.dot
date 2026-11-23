@@ -1,0 +1,22 @@
+digraph G {
+  graph [rankdir=LR, fontname="DejaVu Sans", fontsize=14, labelloc=t, nodesep=0.35, ranksep=1.4, splines=true, compound=true, pad=0.2];
+  node [fontname="DejaVu Sans", fontsize=11];
+  edge [fontname="DejaVu Sans", fontsize=9];
+  zak [shape=none, image="actor.png", label="Zákazník", labelloc=b, imagescale=true, width=0.7, height=1.2, fixedsize=true];
+  spr [shape=none, image="actor.png", label="Správca", labelloc=b, imagescale=true, width=0.7, height=1.2, fixedsize=true];
+  subgraph cluster_sys {
+    label="«subject» e-shop (gateway + monolit + služby)"; style="rounded"; color="#333333"; fontsize=12;
+    node [shape=ellipse, style=filled, fillcolor="#FFFFE0", color="#8B6914"];
+    uc1 [label="Prezerať katalóg\nGET /products"];
+    uc2 [label="Zadať objednávku\nPOST /orders"];
+    uc3 [label="Zobraziť objednávku\nGET /orders/{id}"];
+    uc4 [label="Zobraziť report tržieb\nGET /reports/sales"];
+    uc5 [label="Upraviť stav skladu\nPOST /inventory/{id}/adjust"];
+    uc6 [label="Vytvoriť zákazníka\nPOST /customers"];
+    i1 [label="Overiť zákazníka"]; i2 [label="Rezervovať zásoby"]; i3 [label="Autorizovať platbu"]; i4 [label="Zapísať notifikáciu"];
+  }
+  zak -> uc1 [arrowhead=none]; zak -> uc2 [arrowhead=none]; zak -> uc3 [arrowhead=none];
+  spr -> uc4 [arrowhead=none]; spr -> uc5 [arrowhead=none]; spr -> uc6 [arrowhead=none];
+  edge [style=dashed, arrowhead=open, label="«include»"];
+  uc2 -> i1; uc2 -> i2; uc2 -> i3; uc2 -> i4;
+}

@@ -1,0 +1,38 @@
+@startuml
+title ArchiMate pohľad (vrstvy + Migration view): Plateau 0 (AS-IS) -> Plateau 4 (TO-BE)
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam rectangle {
+  RoundCorner 8
+}
+
+package "Business layer" #FFFFE0 {
+  rectangle "<<Business Service>>\nPredaj tovaru" as bs #FFFFB5
+  rectangle "<<Business Process>>\nSpracovanie objednávky" as bp #FFFFB5
+}
+package "Plateau 0 – AS-IS" #F3F6FB {
+  rectangle "<<Application Component>>\nLegacy monolit\n(customers, catalog, inventory,\norders, payments, notifications, reporting)" as mono #B5FFFF
+  rectangle "<<Node>>\nJeden proces + zdieľaná DB" as n0 #C9E7B7
+}
+package "Plateau 4 – TO-BE" #F3F6FB {
+  rectangle "<<Application Component>>\nAPI Gateway" as gw #B5FFFF
+  rectangle "<<Application Component>>\ncatalog / inventory /\nbilling / ordering service" as svc #B5FFFF
+  rectangle "<<Application Component>>\nLegacy zvyšok\n(customers, notifications)" as rest #B5FFFF
+  rectangle "<<Node>>\nProces + vlastná DB\npre každú službu" as n4 #C9E7B7
+}
+rectangle "<<Work Package>>\nStrangler Fig migrácia\n(4 kroky: Catalog, Inventory, Billing, Ordering)" as wp #FFE0B5
+rectangle "<<Deliverable>>\nKontraktové testy (golden master)" as dl #FFE0B5
+
+bs <-- bp : realizuje
+bp <.. mono : slúži (P0)
+bp <.. gw : slúži (P4)
+gw --> svc : smeruje
+gw --> rest : smeruje
+n0 ..> mono : realizuje
+n4 ..> svc : realizuje
+n4 ..> rest : realizuje
+wp ..> mono : transformuje
+wp ..> gw : zavádza
+wp ..> dl : produkuje
+dl ..> svc : overuje
+@enduml

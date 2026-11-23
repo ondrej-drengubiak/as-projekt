@@ -1,0 +1,32 @@
+digraph G {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=14, labelloc=t, nodesep=0.5, ranksep=0.4, splines=ortho, pad=0.2];
+  node [fontname="DejaVu Sans", fontsize=11];
+  edge [fontname="DejaVu Sans", fontsize=10];
+
+  init [shape=circle, style=filled, fillcolor=black, label="", width=0.25, fixedsize=true];
+  fin  [shape=circle, style=filled, fillcolor=black, label="", width=0.18, fixedsize=true, peripheries=2];
+
+  node [shape=box, style="rounded,filled", fillcolor="#E8F1FB", color="#1F4E79"];
+  a1 [label="Vybrať kandidáta na kontext\n(DDD + statická analýza)"];
+  a2 [label="Napísať charakterizačné testy\n(golden master na rozhraní)"];
+  a3 [label="Zaviesť abstrakciu\n(Branch by Abstraction + feature toggle)"];
+  a4 [label="Postaviť novú službu\ns vlastnou databázou"];
+  a5 [label="Migrovať dáta (cutover)"];
+  a6 [label="Prepnúť toggle a trasu v gateway"];
+  a7 [label="Overiť: kontraktové testy,\nvýkon, vstrekované poruchy"];
+  a8 [label="Odstrániť legacy kód a toggle"];
+  b1 [label="Vrátiť trasu a toggle na monolit\n(rollback)"];
+  b2 [label="Opraviť službu alebo kontrakt"];
+
+  node [shape=diamond, style=filled, fillcolor="white", color="#333333", label="", width=0.3, height=0.3, fixedsize=true];
+  m1; m2;
+  d1 [xlabel="overenie\núspešné?"]; d2 [xlabel="ostáva ďalší\nkontext?"];
+
+  init -> m1; m1 -> a1; a1 -> a2; a2 -> a3; a3 -> m2; m2 -> a4; a4 -> a5; a5 -> a6; a6 -> a7; a7 -> d1;
+  d1 -> a8 [xlabel="[áno]"];
+  d1 -> b1 [xlabel="[nie]"];
+  b1 -> b2; b2 -> m2;
+  a8 -> d2;
+  d2 -> m1 [xlabel="[áno]", constraint=false];
+  d2 -> fin [xlabel="[nie]"];
+}

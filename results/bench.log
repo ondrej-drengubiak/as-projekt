@@ -1,0 +1,6 @@
+S0 monolit {'read': 25.2, 'write': 27.4}
+S1 +Catalog {'read': 34.8, 'write': 51.4}
+S2 +Inventory {'read': 35.1, 'write': 90.6}
+S3 +Billing {'read': 36.0, 'write': 106.4}
+S4 +Ordering {'read': 35.7, 'write': 126.5}
+done

@@ -1,0 +1,97 @@
+classDiagram
+  direction TB
+  namespace Catalog_BC {
+    class Product {
+      <<Entity>>
+      +id : int
+      +sku : String
+      +name : String
+      +price : Money
+      +category : String
+    }
+  }
+  namespace Inventory_BC {
+    class StockItem {
+      <<Aggregate Root>>
+      +productId : int
+      +quantity : int
+      +reserved : int
+      +available() int
+      +reserve(qty) void
+      +commit(qty) void
+      +release(qty) void
+    }
+  }
+  namespace Ordering_BC {
+    class Order {
+      <<Aggregate Root>>
+      +id : int
+      +customerId : int
+      +status : OrderStatus
+      +total : Money
+      +markPaid() void
+      +cancel() void
+    }
+    class OrderItem {
+      <<Value Object>>
+      +productId : int
+      +qty : int
+      +unitPrice : Money
+    }
+    class OrderStatus {
+      <<enumeration>>
+      PENDING
+      PAID
+      CANCELLED
+    }
+  }
+  namespace Billing_BC {
+    class CreditAccount {
+      <<Aggregate Root>>
+      +customerId : int
+      +creditLimit : Money
+      +creditUsed : Money
+      +authorize(amount) Payment
+    }
+    class Payment {
+      <<Entity>>
+      +id : int
+      +orderId : int
+      +amount : Money
+      +status : String
+    }
+  }
+  namespace Customer_BC {
+    class Customer {
+      <<Aggregate Root>>
+      +id : int
+      +name : String
+      +email : String
+    }
+  }
+  namespace Notification_BC {
+    class Notification {
+      <<Entity>>
+      +orderId : int
+      +customerId : int
+      +message : String
+    }
+  }
+  namespace SharedKernel_BC {
+    class Money {
+      <<Value Object>>
+      +amount : decimal
+    }
+  }
+  Order "1" *-- "1..*" OrderItem : obsahuje
+  Order --> "1" OrderStatus : status
+  CreditAccount "1" *-- "0..*" Payment : eviduje
+  OrderItem ..> Product : productId
+  StockItem ..> Product : productId
+  Order ..> Customer : customerId
+  CreditAccount ..> Customer : customerId
+  Payment ..> Order : orderId
+  Notification ..> Order : orderId
+  Product ..> Money
+  Order ..> Money
+  CreditAccount ..> Money

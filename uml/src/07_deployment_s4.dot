@@ -1,0 +1,31 @@
+digraph G {
+  graph [rankdir=LR, fontname="DejaVu Sans", fontsize=14, labelloc=t, nodesep=0.35, ranksep=0.6, compound=true, splines=true, pad=0.2];
+  node [fontname="DejaVu Sans", fontsize=10, shape=note, style=filled, fillcolor="#FFFFE0", color="#555555"];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#333333"];
+
+  client [shape=box3d, label="«device»\nKlient", fillcolor="#FFFFFF"];
+
+  subgraph cluster_host {
+    label="«device» Hostiteľ (localhost / docker-compose)"; style="rounded"; color="#333333"; fontsize=12;
+    subgraph cluster_gw { label="«execution environment»\nuvicorn :8000"; style="filled,rounded"; fillcolor="#F2F2F2"; color="#777777";
+      a_gw [label="«artifact»\ngateway.app"]; }
+    subgraph cluster_mono { label="«execution environment»\nuvicorn :8001"; style="filled,rounded"; fillcolor="#F2F2F2"; color="#777777";
+      a_mono [label="«artifact»\nmonolith.app\n(customers, notifications)"]; d_mono [label="«artifact»\nmonolith.db", fillcolor="#EEEEEE"]; }
+    subgraph cluster_cat { label="«execution environment»\nuvicorn :8101"; style="filled,rounded"; fillcolor="#F2F2F2"; color="#777777";
+      a_cat [label="«artifact»\nservices.catalog.app"]; d_cat [label="«artifact»\ncatalog.db", fillcolor="#EEEEEE"]; }
+    subgraph cluster_inv { label="«execution environment»\nuvicorn :8102"; style="filled,rounded"; fillcolor="#F2F2F2"; color="#777777";
+      a_inv [label="«artifact»\nservices.inventory.app"]; d_inv [label="«artifact»\ninventory.db", fillcolor="#EEEEEE"]; }
+    subgraph cluster_bil { label="«execution environment»\nuvicorn :8103"; style="filled,rounded"; fillcolor="#F2F2F2"; color="#777777";
+      a_bil [label="«artifact»\nservices.billing.app"]; d_bil [label="«artifact»\nbilling.db", fillcolor="#EEEEEE"]; }
+    subgraph cluster_ord { label="«execution environment»\nuvicorn :8104"; style="filled,rounded"; fillcolor="#F2F2F2"; color="#777777";
+      a_ord [label="«artifact»\nservices.ordering.app"]; d_ord [label="«artifact»\nordering.db", fillcolor="#EEEEEE"]; }
+  }
+
+  edge [arrowhead=open];
+  client -> a_gw [label="«HTTP/JSON»"];
+  a_gw -> a_mono [label="«HTTP»"]; a_gw -> a_cat [label="«HTTP»"]; a_gw -> a_inv [label="«HTTP»"]; a_gw -> a_ord [label="«HTTP»"];
+  a_ord -> a_cat [label="«HTTP»"]; a_ord -> a_inv [label="«HTTP»"]; a_ord -> a_bil [label="«HTTP»"]; a_ord -> a_mono [label="«HTTP»"];
+  a_cat -> a_inv [label="«HTTP»"]; a_mono -> a_bil [label="«HTTP»"];
+  edge [arrowhead=none, style=dotted, color="#777777", label=""];
+  a_mono -> d_mono; a_cat -> d_cat; a_inv -> d_inv; a_bil -> d_bil; a_ord -> d_ord;
+}

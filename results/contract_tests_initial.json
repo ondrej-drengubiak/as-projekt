@@ -1,0 +1,10 @@
+{
+ "note": "Prvý beh pred opravou propagácie chybových hlásení v common/remote.py",
+ "stage_deviations_from_S0_transcript": {
+  "S1": 0,
+  "S2": 2,
+  "S3": 4,
+  "S4": 4
+ },
+ "cause": "remote klient zahadzoval pole 'detail' z odpovede služby (napr. 'product 5' -> 'inventory reserve')"
+}

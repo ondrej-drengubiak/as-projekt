@@ -1,0 +1,43 @@
+@startuml
+title Sekvenčný diagram – zadanie objednávky TO-BE (orchestrovaná saga)
+skinparam shadowing false
+actor Klient
+participant "API Gateway" as GW
+participant "ordering-service" as ORD
+participant "Legacy\n(customers)" as MONO
+participant "catalog-service" as CAT
+participant "inventory-service" as INV
+participant "billing-service" as BIL
+
+Klient -> GW : POST /orders
+GW -> ORD : POST /orders
+ORD -> MONO : GET /customers/{id}  (ACL)
+ORD -> CAT : GET /products/{id}?with_stock=false
+ORD -> ORD : INSERT order (PENDING)
+loop pre každú položku
+  ORD -> INV : POST /inventory/{pid}/reserve
+  alt nedostatok zásob
+    INV --> ORD : 409
+    ORD -> INV : release(rezervované položky)
+    ORD -> ORD : status = CANCELLED
+    ORD --> Klient : 409
+  end
+end
+ORD -> BIL : POST /payments
+alt platba autorizovaná
+  BIL --> ORD : 201
+  loop pre každú položku
+    ORD -> INV : POST /inventory/{pid}/commit
+  end
+  ORD -> ORD : status = PAID
+  ORD ->> MONO : POST /notifications (best effort)
+  ORD --> Klient : 201 Created
+else zamietnutie (402) alebo nedostupnosť (503)
+  BIL --> ORD : 402 / 503
+  loop kompenzácia
+    ORD -> INV : POST /inventory/{pid}/release
+  end
+  ORD -> ORD : status = CANCELLED
+  ORD --> Klient : 402 / 503
+end
+@enduml

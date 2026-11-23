@@ -1,0 +1,20 @@
+sequenceDiagram
+  actor K as Klient
+  participant GW as API Gateway
+  participant NEW as Nová služba
+  participant OLD as Legacy monolit
+
+  K->>+GW: {metóda} {cesta}
+  GW->>GW: upstream(cesta): hľadanie prefixu v ROUTES
+  alt cesta má prefix v ROUTES (napr. GET /products/3)
+    GW->>+NEW: GET /products/3
+    NEW-->>-GW: 200 produkt
+  else žiadny prefix nesedí, použije sa DEFAULT (napr. GET /customers/7)
+    GW->>+OLD: GET /customers/7
+    OLD-->>-GW: 200 zákazník
+  end
+  opt upstream nedostupný (httpx.HTTPError)
+    GW-->>K: 502 bad gateway
+  end
+  GW-->>-K: odpoveď (rovnaký kontrakt)
+  Note over OLD: vnútri monolitu Branch by Abstraction: CATALOG_MODE, INVENTORY_MODE, PAYMENT_MODE prepínajú lokálnu a vzdialenú implementáciu

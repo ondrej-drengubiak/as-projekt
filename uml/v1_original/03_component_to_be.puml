@@ -1,0 +1,42 @@
+@startuml
+title Komponentový diagram – TO-BE (po migrácii, etapa S4)
+skinparam componentStyle uml2
+skinparam shadowing false
+skinparam ArrowFontSize 11
+skinparam nodesep 40
+skinparam ranksep 55
+
+component "API Gateway\n(Strangler Fig facade)" as GW
+
+component "ordering-service\n«saga orchestrátor»" as ORD
+
+component "catalog-service" as CAT
+component "inventory-service" as INV
+component "billing-service" as BIL
+component "Legacy zvyšok\n(customers, notifications)" as MONO
+
+database "ordering.db" as D4
+database "catalog.db" as D1
+database "inventory.db" as D2
+database "billing.db" as D3
+database "monolith.db" as D5
+
+GW -down-> ORD : IOrders\n/orders, /reports
+GW -down-> CAT : ICatalog\n/products
+GW -down-> INV : IInventory\n/inventory
+GW -down-> MONO : ICustomers\n(default trasa)
+
+ORD -down-> CAT : cena produktu
+ORD -down-> INV : reserve / commit / release
+ORD -down-> BIL : charge
+ORD -down-> MONO : ACL: overenie zákazníka,\nnotifikácia
+CAT -right-> INV : in_stock
+MONO -right-> BIL : open_account
+
+ORD -left- D4
+CAT -down- D1
+INV -down- D2
+BIL -down- D3
+MONO -down- D5
+note bottom of D2 : každá služba vlastní svoju databázu,\nžiadne zdieľané tabuľky
+@enduml

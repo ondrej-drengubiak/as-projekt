@@ -1,0 +1,24 @@
+@startuml
+title Diagram aktivít – metodický postup migrácie jedného Bounded Contextu
+skinparam shadowing false
+start
+:Identifikovať kandidáta na kontext\n(DDD + statická analýza);
+:Napísať charakterizačné testy\n(golden master na rozhraní);
+:Zaviesť abstrakciu\n(Branch by Abstraction + feature toggle);
+:Postaviť novú službu s vlastnou DB;
+:Migrovať dáta (cutover);
+:Prepnúť toggle a trasu v gateway;
+if (testy + výkon + zlyhania OK?) then (áno)
+  :Odstrániť legacy kód a toggle;
+else (nie)
+  :Vrátiť trasu na monolit (rollback);
+  :Opraviť službu / kontrakt;
+  detach
+endif
+if (ostáva ďalší kontext?) then (áno)
+  :Vybrať ďalší kontext;
+  detach
+else (nie)
+  stop
+endif
+@enduml

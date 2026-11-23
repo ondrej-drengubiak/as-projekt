@@ -1,0 +1,49 @@
+// Pevné pozície (neato -n): komponenty dole, rozhrania nad nimi, gateway navrchu.
+digraph G {
+  graph [fontname="DejaVu Sans", fontsize=14, labelloc=t, splines=true, outputorder=edgesfirst, pad=0.3, overlap=false, bb="0,0,1070,660"];
+  node [fontname="DejaVu Sans", fontsize=11];
+  edge [fontname="DejaVu Sans", fontsize=9];
+
+  node [shape=component, style=filled, fillcolor="#FFFFE0", color="#8B0000", width=1.7, height=0.75, fixedsize=true];
+  GW   [pos="520,600!", label="«component»\nAPI Gateway\n(Strangler Fig fasáda)"];
+  CAT  [pos="95,300!", label="«component»\ncatalog-service"];
+  INV  [pos="295,300!", label="«component»\ninventory-service"];
+  ORD  [pos="520,300!", label="«component»\nordering-service\n(saga orchestrátor)"];
+  MONO [pos="760,300!", label="«component»\nLegacy zvyšok\n(customers,\nnotifications)"];
+  BIL  [pos="970,300!", label="«component»\nbilling-service"];
+
+  node [shape=circle, style=filled, fillcolor="white", color="#333333", width=0.24, height=0.24, label="", fixedsize=true];
+  iCat [pos="95,440!"]; iInv [pos="295,440!"]; iOrd [pos="520,440!"]; iCus [pos="700,440!"]; iNot [pos="805,440!"]; iBil [pos="970,440!"];
+
+  node [shape=plaintext, style=filled, fillcolor="white", fontsize=9, width=1.2, height=0.4, fixedsize=true];
+  lCat [pos="95,380!", label="ICatalog\n/products"];
+  lInv [pos="295,380!", label="IInventory\n/inventory/{id}/…"];
+  lOrd [pos="520,380!", label="IOrders\n/orders, /reports"];
+  lCus [pos="690,380!", label="ICustomers\n/customers"];
+  lNot [pos="830,380!", label="INotifications\n/notifications"];
+  lBil [pos="970,380!", label="IBilling\n/payments, /accounts"];
+
+  node [shape=cylinder, style=filled, fillcolor="#EEEEEE", color="#444444", fontsize=10, width=1.3, height=0.6, fixedsize=true];
+  dCat  [pos="95,170!", label="«datastore»\ncatalog.db"];
+  dInv  [pos="295,170!", label="«datastore»\ninventory.db"];
+  dOrd  [pos="520,170!", label="«datastore»\nordering.db"];
+  dMono [pos="760,170!", label="«datastore»\nmonolith.db"];
+  dBil  [pos="970,170!", label="«datastore»\nbilling.db"];
+
+  legend [shape=plaintext, style="", fixedsize=false, pos="520,60!", fontsize=10, width=0, height=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3">
+    <TR><TD ALIGN="LEFT">&#9679;&#8212; poskytované rozhranie</TD><TD ALIGN="LEFT"><FONT COLOR="#1F4E79">- - &gt;</FONT> gateway vyžaduje rozhranie (trasa v ROUTES)</TD></TR>
+    <TR><TD ALIGN="LEFT"><FONT COLOR="#8B0000">- - &gt;</FONT> služba vyžaduje rozhranie (HTTP)</TD><TD ALIGN="LEFT">&#183; &#183; &#183; vlastná databáza služby</TD></TR></TABLE>>];
+
+  // poskytuje
+  edge [dir=none, color="#333333", style=solid];
+  CAT -> iCat; INV -> iInv; ORD -> iOrd; MONO -> iCus; MONO -> iNot; BIL -> iBil;
+  // dáta
+  edge [dir=none, style=dotted, color="#777777"];
+  CAT -> dCat; INV -> dInv; ORD -> dOrd; MONO -> dMono; BIL -> dBil;
+  // vyžaduje
+  edge [dir=forward, arrowhead=open, style=dashed, color="#1F4E79"];
+  GW -> iCat; GW -> iInv; GW -> iOrd; GW -> iCus;
+  edge [color="#8B0000"];
+  ORD -> iCat; ORD -> iInv; ORD -> iCus; ORD -> iNot; ORD -> iBil;
+  CAT -> iInv; MONO -> iBil;
+}

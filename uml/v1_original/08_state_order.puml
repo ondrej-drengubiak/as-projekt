@@ -1,0 +1,13 @@
+@startuml
+title Stavový diagram – životný cyklus objednávky a rezervácie
+skinparam shadowing false
+[*] --> PENDING : place order
+PENDING --> PAID : platba autorizovaná\n+ commit zásob
+PENDING --> CANCELLED : nedostatok zásob / platba zlyhala\n+ release rezervácií (kompenzácia)
+PAID --> [*]
+CANCELLED --> [*]
+note right of PENDING
+  Ak kompenzácia chýba, objednávka
+  zostane v PENDING a rezervácie "unikajú".
+end note
+@enduml

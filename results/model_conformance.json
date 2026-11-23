@@ -1,0 +1,294 @@
+{
+ "truth": {
+  "as_is": {
+   "main": [
+    "customers.get",
+    "catalog.get_product",
+    "db.BEGIN",
+    "db.INSERT orders",
+    "inventory.reserve",
+    "db.INSERT order_items",
+    "payments.charge",
+    "inventory.commit",
+    "db.UPDATE orders PAID",
+    "db.COMMIT",
+    "notifications.send"
+   ],
+   "handler": [
+    "db.ROLLBACK"
+   ],
+   "nested": [
+    "db.INSERT notifications",
+    "db.INSERT payments",
+    "db.UPDATE customers",
+    "db.UPDATE stock",
+    "notifications>customers.get",
+    "payments>customers.credit_left"
+   ],
+   "excluded_hybrid_only": [
+    "inventory.release",
+    "db.UPDATE orders CANCELLED"
+   ]
+  },
+  "saga": {
+   "main": [
+    "monolith.customer_get",
+    "catalog.get_product",
+    "db.INSERT orders",
+    "inventory.reserve",
+    "db.INSERT order_items",
+    "billing.charge",
+    "inventory.commit",
+    "db.UPDATE orders PAID",
+    "monolith.notify"
+   ],
+   "handler": [
+    "inventory.release",
+    "db.UPDATE orders CANCELLED"
+   ],
+   "nested": []
+  },
+  "async_calls_in_saga_code": 0
+ },
+ "sequence": {
+  "as_is_v1": {
+   "messages": 16,
+   "calls": 14,
+   "replies": 2,
+   "ops_in_model": [
+    "catalog.get_product",
+    "customers.get",
+    "db.BEGIN",
+    "db.COMMIT",
+    "db.INSERT orders",
+    "db.INSERT payments",
+    "db.ROLLBACK",
+    "db.UPDATE customers",
+    "db.UPDATE orders PAID",
+    "db.UPDATE stock",
+    "inventory.commit",
+    "inventory.reserve",
+    "notifications.send",
+    "payments.charge"
+   ],
+   "ops_missing": [
+    "db.INSERT notifications",
+    "db.INSERT order_items",
+    "notifications>customers.get",
+    "payments>customers.credit_left"
+   ],
+   "ops_phantom": [],
+   "recall": 0.778,
+   "precision": 1.0,
+   "order_lcs": 0.909,
+   "pairs": 6,
+   "pairs_with_reply": 1,
+   "reply_pair_coverage": 0.167,
+   "activations": 0,
+   "break_fragments": 0,
+   "async_messages": 0,
+   "error_exits_in_loop_without_break": 0
+  },
+  "as_is_v2": {
+   "messages": 32,
+   "calls": 19,
+   "replies": 13,
+   "ops_in_model": [
+    "catalog.get_product",
+    "customers.get",
+    "db.BEGIN",
+    "db.COMMIT",
+    "db.INSERT notifications",
+    "db.INSERT order_items",
+    "db.INSERT orders",
+    "db.INSERT payments",
+    "db.ROLLBACK",
+    "db.UPDATE customers",
+    "db.UPDATE orders PAID",
+    "db.UPDATE stock",
+    "inventory.commit",
+    "inventory.reserve",
+    "notifications.send",
+    "notifications>customers.get",
+    "payments.charge",
+    "payments>customers.credit_left"
+   ],
+   "ops_missing": [],
+   "ops_phantom": [],
+   "recall": 1.0,
+   "precision": 1.0,
+   "order_lcs": 1.0,
+   "pairs": 8,
+   "pairs_with_reply": 8,
+   "reply_pair_coverage": 1.0,
+   "activations": 9,
+   "break_fragments": 4,
+   "async_messages": 0,
+   "error_exits_in_loop_without_break": 0
+  },
+  "saga_v1": {
+   "messages": 20,
+   "calls": 14,
+   "replies": 6,
+   "ops_in_model": [
+    "billing.charge",
+    "catalog.get_product",
+    "db.INSERT orders",
+    "db.UPDATE orders CANCELLED",
+    "db.UPDATE orders PAID",
+    "inventory.commit",
+    "inventory.release",
+    "inventory.reserve",
+    "monolith.customer_get",
+    "monolith.notify"
+   ],
+   "ops_missing": [
+    "db.INSERT order_items"
+   ],
+   "ops_phantom": [],
+   "recall": 0.909,
+   "precision": 1.0,
+   "order_lcs": 0.889,
+   "pairs": 6,
+   "pairs_with_reply": 2,
+   "reply_pair_coverage": 0.333,
+   "activations": 0,
+   "break_fragments": 0,
+   "async_messages": 1,
+   "error_exits_in_loop_without_break": 1
+  },
+  "saga_v2": {
+   "messages": 33,
+   "calls": 15,
+   "replies": 18,
+   "ops_in_model": [
+    "billing.charge",
+    "catalog.get_product",
+    "db.INSERT order_items",
+    "db.INSERT orders",
+    "db.UPDATE orders CANCELLED",
+    "db.UPDATE orders PAID",
+    "inventory.commit",
+    "inventory.release",
+    "inventory.reserve",
+    "monolith.customer_get",
+    "monolith.notify"
+   ],
+   "ops_missing": [],
+   "ops_phantom": [],
+   "recall": 1.0,
+   "precision": 1.0,
+   "order_lcs": 1.0,
+   "pairs": 6,
+   "pairs_with_reply": 6,
+   "reply_pair_coverage": 1.0,
+   "activations": 10,
+   "break_fragments": 4,
+   "async_messages": 0,
+   "error_exits_in_loop_without_break": 0
+  }
+ },
+ "structure_truth": {
+  "active": [
+   "catalog->inventory",
+   "gateway->catalog",
+   "gateway->inventory",
+   "gateway->monolith",
+   "gateway->ordering",
+   "monolith->billing",
+   "ordering->billing",
+   "ordering->catalog",
+   "ordering->inventory",
+   "ordering->monolith"
+  ],
+  "dormant": [
+   "monolith->catalog",
+   "monolith->inventory"
+  ],
+  "monolith_live_handlers": [
+   "app.create_customer",
+   "app.get_customer",
+   "app.get_notifications",
+   "app.health",
+   "app.post_notification"
+  ]
+ },
+ "component_to_be_v1": {
+  "model_edges": 10,
+  "truth_edges": 10,
+  "matched": 10,
+  "recall": 1.0,
+  "precision": 1.0,
+  "missing": [],
+  "phantom": [],
+  "dormant_in_code": [
+   "monolith->catalog",
+   "monolith->inventory"
+  ],
+  "dormant_in_model": []
+ },
+ "component_to_be_v2": {
+  "model_edges": 10,
+  "truth_edges": 10,
+  "matched": 10,
+  "recall": 1.0,
+  "precision": 1.0,
+  "missing": [],
+  "phantom": [],
+  "dormant_in_code": [
+   "monolith->catalog",
+   "monolith->inventory"
+  ],
+  "dormant_in_model": []
+ },
+ "deployment_v1": {
+  "model_edges": 10,
+  "truth_edges": 10,
+  "matched": 10,
+  "recall": 1.0,
+  "precision": 1.0,
+  "missing": [],
+  "phantom": [],
+  "dormant_in_code": [
+   "monolith->catalog",
+   "monolith->inventory"
+  ],
+  "dormant_in_model": []
+ },
+ "deployment_v2": {
+  "model_edges": 10,
+  "truth_edges": 10,
+  "matched": 10,
+  "recall": 1.0,
+  "precision": 1.0,
+  "missing": [],
+  "phantom": [],
+  "dormant_in_code": [
+   "monolith->catalog",
+   "monolith->inventory"
+  ],
+  "dormant_in_model": []
+ },
+ "component_as_is": {
+  "cycles_v1": {
+   "found": 2,
+   "truth": 2,
+   "phantom": 0
+  },
+  "cycles_v2": {
+   "found": 2,
+   "truth": 2,
+   "phantom": 0
+  },
+  "foreign_v1": {
+   "found": 4,
+   "truth": 4,
+   "phantom": 0
+  },
+  "foreign_v2": {
+   "found": 4,
+   "truth": 4,
+   "phantom": 0
+  }
+ }
+}

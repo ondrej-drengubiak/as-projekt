@@ -1,0 +1,62 @@
+sequenceDiagram
+  actor K as Klient
+  participant GW as API Gateway
+  participant ORD as ordering-service
+  participant ODB as ordering.db
+  participant M as Legacy zvyšok
+  participant CAT as catalog-service
+  participant INV as inventory-service
+  participant BIL as billing-service
+
+  K->>+GW: POST /orders
+  GW->>+ORD: POST /orders
+  ORD->>+M: GET /customers/{id}  «ACL»
+  M-->>-ORD: 200 zákazník | 404
+  break zákazník neexistuje
+    ORD-->>GW: 404
+    GW-->>K: 404
+  end
+  loop pre každú položku
+    ORD->>+CAT: GET /products/{id}?with_stock=false
+    CAT-->>-ORD: 200 produkt | 404
+  end
+  break produkt neexistuje
+    ORD-->>GW: 404
+    GW-->>K: 404
+  end
+  ORD->>ODB: INSERT orders (PENDING)
+  loop pre každú položku
+    ORD->>+INV: POST /inventory/{pid}/reserve
+    INV-->>-ORD: 200 | 409 nedostatok zásob
+    break rezervácia zlyhala (409)
+      loop pre už rezervované položky
+        ORD->>+INV: POST /inventory/{pid}/release
+        INV-->>-ORD: 200
+      end
+      ORD->>ODB: UPDATE orders SET status = CANCELLED
+      ORD-->>GW: 409
+      GW-->>K: 409
+    end
+    ORD->>ODB: INSERT order_items
+  end
+  ORD->>+BIL: POST /payments
+  BIL-->>-ORD: 201 AUTHORIZED | 402 | 503
+  break platba zamietnutá (402) alebo nedostupná (503)
+    loop kompenzácia: pre každú rezerváciu
+      ORD->>+INV: POST /inventory/{pid}/release
+      INV-->>-ORD: 200
+    end
+    ORD->>ODB: UPDATE orders SET status = CANCELLED
+    ORD-->>GW: 402 / 503
+    GW-->>K: 402 / 503
+  end
+  loop pre každú položku
+    ORD->>+INV: POST /inventory/{pid}/commit
+    INV-->>-ORD: 200
+  end
+  Note over ORD,INV: výnimka v commit spustí release + CANCELLED, platba sa nevracia (kód nemá refund)
+  ORD->>ODB: UPDATE orders SET status = PAID
+  ORD->>+M: POST /notifications  (chyba sa ignoruje)
+  M-->>-ORD: 201
+  ORD-->>-GW: 201 Created
+  GW-->>-K: 201 Created

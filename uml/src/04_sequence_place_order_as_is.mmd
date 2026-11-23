@@ -1,0 +1,58 @@
+sequenceDiagram
+  actor K as Klient
+  participant O as orders
+  participant C as customers
+  participant CT as catalog
+  participant I as inventory
+  participant P as payments
+  participant N as notifications
+  participant DB as monolith.db
+
+  K->>+O: POST /orders
+  O->>+C: get(customerId)
+  C-->>-O: zákazník
+  break zákazník neexistuje
+    O-->>K: 404
+  end
+  loop pre každú položku
+    O->>+CT: get_product(pid)
+    CT-->>-O: produkt (cena)
+  end
+  break produkt neexistuje
+    O-->>K: 404
+  end
+  O->>DB: BEGIN IMMEDIATE
+  O->>DB: INSERT orders (PENDING)
+  loop pre každú položku
+    O->>+I: reserve(pid, qty)
+    I->>DB: UPDATE stock (reserved += qty)
+    I-->>-O: ok
+    break nedostatok zásob (409)
+      O->>DB: ROLLBACK
+      Note right of DB: ROLLBACK zruší aj rezervácie
+      O-->>K: 409
+    end
+    O->>DB: INSERT order_items
+  end
+  O->>+P: charge(orderId, customerId, amount)
+  P->>+C: credit_left(customerId)
+  C-->>-P: zostávajúci úver
+  Note over P,C: cyklus customers ↔ payments
+  P->>DB: UPDATE customers (credit_used), INSERT payments
+  P-->>-O: AUTHORIZED
+  break platba zamietnutá (402) alebo nedostupná (503)
+    O->>DB: ROLLBACK
+    O-->>K: 402 / 503
+  end
+  loop pre každú položku
+    O->>+I: commit(pid, qty)
+    I-->>-O: ok
+  end
+  O->>DB: UPDATE orders SET status = PAID
+  O->>DB: COMMIT
+  O->>+N: send(orderId, customerId, message)
+  N->>+C: get(customerId)
+  C-->>-N: zákazník (e-mail)
+  N->>DB: INSERT notifications
+  N-->>-O: ok
+  O-->>-K: 201 Created

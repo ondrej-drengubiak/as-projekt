@@ -1,0 +1,198 @@
+{
+ "modules": {
+  "customers": {
+   "Ce": 1,
+   "Ca": 3,
+   "I": 0.25
+  },
+  "catalog": {
+   "Ce": 1,
+   "Ca": 2,
+   "I": 0.33
+  },
+  "inventory": {
+   "Ce": 1,
+   "Ca": 2,
+   "I": 0.33
+  },
+  "orders": {
+   "Ce": 5,
+   "Ca": 0,
+   "I": 1.0
+  },
+  "payments": {
+   "Ce": 1,
+   "Ca": 2,
+   "I": 0.33
+  },
+  "notifications": {
+   "Ce": 1,
+   "Ca": 1,
+   "I": 0.5
+  },
+  "reporting": {
+   "Ce": 0,
+   "Ca": 0,
+   "I": 0
+  }
+ },
+ "cycles": [
+  [
+   "customers",
+   "payments"
+  ],
+  [
+   "catalog",
+   "inventory"
+  ]
+ ],
+ "n_functions": 23,
+ "n_call_edges": 28,
+ "cross_owner_table_access": [
+  {
+   "module": "payments",
+   "table": "customers",
+   "owner": "customers",
+   "mode": "W"
+  },
+  {
+   "module": "reporting",
+   "table": "order_items",
+   "owner": "orders",
+   "mode": "R"
+  },
+  {
+   "module": "reporting",
+   "table": "orders",
+   "owner": "orders",
+   "mode": "R"
+  },
+  {
+   "module": "reporting",
+   "table": "products",
+   "owner": "catalog",
+   "mode": "R"
+  }
+ ],
+ "n_cross_owner_table_access": 4,
+ "shared_tables": {
+  "customers": [
+   "customers",
+   "payments"
+  ],
+  "products": [
+   "catalog",
+   "reporting"
+  ],
+  "orders": [
+   "orders",
+   "reporting"
+  ],
+  "order_items": [
+   "orders",
+   "reporting"
+  ]
+ },
+ "ddd": {
+  "contexts": 6,
+  "Q": 0.33,
+  "calls_cut": 14,
+  "table_pairs_cut": 5
+ },
+ "louvain": {
+  "communities": 4,
+  "Q": 0.394,
+  "calls_cut": 10,
+  "table_pairs_cut": 8,
+  "ARI_vs_DDD": 0.354,
+  "members": [
+   [
+    "inventory.commit",
+    "inventory.is_remote",
+    "inventory.release",
+    "inventory.reserve"
+   ],
+   [
+    "catalog.get_product",
+    "catalog.is_remote",
+    "catalog.list_products",
+    "inventory.adjust",
+    "inventory.available",
+    "inventory.get"
+   ],
+   [
+    "orders._compensate",
+    "orders.get",
+    "orders.place",
+    "reporting.sales_report"
+   ],
+   [
+    "customers.create",
+    "customers.credit_left",
+    "customers.get",
+    "notifications.for_order",
+    "notifications.send",
+    "orders._atomic",
+    "payments.charge",
+    "payments.is_remote",
+    "payments.open_account"
+   ]
+  ]
+ },
+ "random_baseline": {
+  "Q_mean": -0.052,
+  "Q_std": 0.052,
+  "Q_p95": 0.035,
+  "n": 2000
+ },
+ "to_be_services": {
+  "catalog": {
+   "tables_used": [
+    "products"
+   ],
+   "foreign_tables": [],
+   "sync_deps": [
+    "inventory"
+   ]
+  },
+  "inventory": {
+   "tables_used": [
+    "stock"
+   ],
+   "foreign_tables": [],
+   "sync_deps": []
+  },
+  "billing": {
+   "tables_used": [
+    "accounts",
+    "payments"
+   ],
+   "foreign_tables": [],
+   "sync_deps": []
+  },
+  "ordering": {
+   "tables_used": [
+    "order_items",
+    "orders"
+   ],
+   "foreign_tables": [],
+   "sync_deps": [
+    "billing",
+    "catalog",
+    "inventory",
+    "monolith"
+   ]
+  },
+  "monolith_remainder": {
+   "tables_used": [
+    "customers",
+    "notifications"
+   ],
+   "foreign_tables": [],
+   "sync_deps": [
+    "billing"
+   ]
+  }
+ },
+ "to_be_http_dependencies": 6
+}

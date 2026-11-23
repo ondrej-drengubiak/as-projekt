@@ -1,0 +1,25 @@
+@startuml
+title Sekvenčný diagram – Strangler Fig: smerovanie požiadaviek počas migrácie
+skinparam shadowing false
+actor Klient
+participant "API Gateway" as GW
+participant "Nová služba\n(napr. catalog-service)" as NEW
+participant "Legacy monolit" as OLD
+
+Klient -> GW : GET /products/3
+GW -> GW : lookup v tabuľke ROUTES
+alt cesta je už vyčlenená (/products)
+  GW -> NEW : GET /products/3
+  NEW --> GW : 200
+else cesta ešte patrí monolitu
+  GW -> OLD : GET /customers/7
+  OLD --> GW : 200
+end
+GW --> Klient : odpoveď (rovnaký kontrakt)
+note over OLD
+  Vnútri monolitu: Branch by Abstraction –
+  modul catalog/inventory/payments prepína
+  lokálnu a vzdialenú implementáciu
+  podľa feature toggle (CATALOG_MODE, ...).
+end note
+@enduml

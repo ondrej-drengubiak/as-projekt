@@ -1,0 +1,56 @@
+// Pevné pozície (neato -n): vrstvy nad sebou (biznis, aplikácia, technológia).
+digraph G {
+  graph [fontname="DejaVu Sans", splines=line, outputorder=nodesfirst, pad=0.2, bb="0,-60,1010,1020"];
+  node [fontname="DejaVu Sans", fontsize=11, style="filled", color="#555555", fixedsize=true, width=1.75, height=0.85];
+  edge [fontname="DejaVu Sans", fontsize=9, color="#333333"];
+  node [height=0.85, width=1.75, shape=box, style="filled", label=""];
+  bandB [pos="500,930!", width=14.0, height=1.8, fillcolor="#FFFFF0", color="#B8B800"];
+  bandA [pos="500,590!", width=14.0, height=5.4, fillcolor="#F0FFFF", color="#2AA9A9"];
+  bandT [pos="500,150!", width=14.0, height=3.5, fillcolor="#F4FBF0", color="#5B9E3E"];
+  node [shape=plaintext, style="", width=2.2, height=0.3, fontsize=12];
+  lB [pos="75,1000!", label="Business layer"]; lA [pos="85,810!", label="Application layer"]; lT [pos="82,265!", label="Technology layer"];
+  bob [height=0.85, width=1.75, shape=tab, style="filled", fillcolor="#FFFFB5", pos="100,930!", label=<<FONT POINT-SIZE="8">«Business Object»</FONT><BR/><B>Objednávka</B>>];
+  bpr [height=0.85, width=1.75, shape=box, style="rounded,filled", fillcolor="#FFFFB5", pos="330,930!", label=<<FONT POINT-SIZE="8">«Business Process»</FONT><BR/><B>Spracovanie<BR/>objednávky</B>>];
+  bsv [height=0.85, width=1.75, shape=box, style="rounded,filled", fillcolor="#FFFFB5", pos="600,930!", label=<<FONT POINT-SIZE="8">«Business Service»</FONT><BR/><B>Predaj tovaru</B>>];
+  zak [height=0.85, width=1.75, shape=box, style="filled", fillcolor="#FFFFB5", pos="860,930!", label=<<FONT POINT-SIZE="8">«Business Actor»</FONT><BR/><B>Zákazník</B>>];
+  sCat [height=0.85, width=1.75, shape=box, style="rounded,filled", fillcolor="#B5FFFF", pos="100,670!", label=<<FONT POINT-SIZE="8">«Application Service»</FONT><BR/><B>Katalóg<BR/>produktov</B>>];
+  sInv [height=0.85, width=1.75, shape=box, style="rounded,filled", fillcolor="#B5FFFF", pos="300,670!", label=<<FONT POINT-SIZE="8">«Application Service»</FONT><BR/><B>Správa skladu</B>>];
+  sOrd [height=0.85, width=1.75, shape=box, style="rounded,filled", fillcolor="#B5FFFF", pos="500,670!", label=<<FONT POINT-SIZE="8">«Application Service»</FONT><BR/><B>Správa<BR/>objednávok</B>>];
+  sBil [height=0.85, width=1.75, shape=box, style="rounded,filled", fillcolor="#B5FFFF", pos="700,670!", label=<<FONT POINT-SIZE="8">«Application Service»</FONT><BR/><B>Platby a úver</B>>];
+  aif [height=0.85, shape=box, style="rounded,filled", fillcolor="#B5FFFF", width=2.0, pos="900,670!", label=<<FONT POINT-SIZE="8">«Application Interface»</FONT><BR/><B>REST API<BR/>(nemenný kontrakt)</B>>];
+  gw [height=0.85, width=1.75, shape=component, style="filled", fillcolor="#B5FFFF", pos="900,770!", label=<<FONT POINT-SIZE="8">«Application Component»</FONT><BR/><B>API Gateway</B>>];
+  cCat [height=0.85, width=1.75, shape=component, style="filled", fillcolor="#B5FFFF", pos="100,540!", label=<<FONT POINT-SIZE="8">«Application Component»</FONT><BR/><B>catalog-<BR/>service</B>>];
+  cInv [height=0.85, width=1.75, shape=component, style="filled", fillcolor="#B5FFFF", pos="300,540!", label=<<FONT POINT-SIZE="8">«Application Component»</FONT><BR/><B>inventory-<BR/>service</B>>];
+  cOrd [height=0.85, width=1.75, shape=component, style="filled", fillcolor="#B5FFFF", pos="500,540!", label=<<FONT POINT-SIZE="8">«Application Component»</FONT><BR/><B>ordering-<BR/>service</B>>];
+  cBil [height=0.85, width=1.75, shape=component, style="filled", fillcolor="#B5FFFF", pos="700,540!", label=<<FONT POINT-SIZE="8">«Application Component»</FONT><BR/><B>billing-<BR/>service</B>>];
+  cLeg [height=0.85, width=1.75, shape=component, style="filled", fillcolor="#B5FFFF", pos="900,540!", label=<<FONT POINT-SIZE="8">«Application Component»</FONT><BR/><B>Legacy zvyšok</B>>];
+  oInv [height=0.85, width=1.75, shape=tab, style="filled", fillcolor="#B5FFFF", pos="300,420!", label=<<FONT POINT-SIZE="8">«Data Object»</FONT><BR/><B>StockItem</B>>];
+  oOrd [height=0.85, width=1.75, shape=tab, style="filled", fillcolor="#B5FFFF", pos="500,420!", label=<<FONT POINT-SIZE="8">«Data Object»</FONT><BR/><B>Order</B>>];
+  oPay [height=0.85, width=1.75, shape=tab, style="filled", fillcolor="#B5FFFF", pos="700,420!", label=<<FONT POINT-SIZE="8">«Data Object»</FONT><BR/><B>CreditAccount,<BR/>Payment</B>>];
+  ar1 [height=0.85, shape=note, style="filled", fillcolor="#C9E7B7", width=2.0, pos="100,200!", label=<<FONT POINT-SIZE="8">«Artifact»</FONT><BR/><B>gateway.app, monolith.app,<BR/>services.*.app</B>>];
+  nd [height=0.85, width=1.75, shape=box3d, style="filled", fillcolor="#C9E7B7", pos="380,200!", label=<<FONT POINT-SIZE="8">«Node»</FONT><BR/><B>6 procesov uvicorn<BR/>(porty 8000 až 8104)</B>>];
+  ar2 [height=0.85, width=1.75, shape=note, style="filled", fillcolor="#C9E7B7", pos="660,200!", label=<<FONT POINT-SIZE="8">«Artifact»</FONT><BR/><B>*.db<BR/>(5 súborov SQLite)</B>>];
+  ssw [height=0.85, width=1.75, shape=ellipse, style="filled", fillcolor="#C9E7B7", pos="380,80!", label=<<FONT POINT-SIZE="8">«System Software»</FONT><BR/><B>Python 3.12 + FastAPI</B>>];
+  edge [dir=forward, arrowtail=none, arrowhead=empty, style=dashed];
+  bpr -> bsv;
+  edge [arrowhead=open, style=solid];
+  bsv -> zak;
+  edge [arrowhead=vee, style=dotted, arrowsize=0.6];
+  bpr -> bob;
+  edge [arrowhead=empty, style=dashed, arrowsize=1];
+  cCat -> sCat; cInv -> sInv; cOrd -> sOrd; cBil -> sBil;
+  edge [arrowhead=open, style=solid];
+  sCat -> bpr; sInv -> bpr; sOrd -> bpr; sBil -> bpr; aif -> bpr;
+  sCat -> cOrd; sInv -> cOrd; sBil -> cOrd; sInv -> cCat;
+  edge [dir=both, arrowtail=dot, arrowhead=normal, style=solid];
+  gw -> aif; nd -> ar1; nd -> ar2;
+  edge [dir=forward, arrowtail=none, arrowhead=vee, style=dotted, arrowsize=0.6];
+  cInv -> oInv; cOrd -> oOrd; cBil -> oPay;
+  edge [dir=back, arrowtail=diamond, arrowhead=none, style=solid, arrowsize=1];
+  nd -> ssw;
+  edge [dir=forward, arrowtail=none, arrowhead=empty, style=dashed];
+  ar1 -> cCat; ar2 -> oOrd;
+  legend [shape=plaintext, style="", fixedsize=false, pos="800,150!", fontsize=10, width=0, height=0, label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" CELLPADDING="3">
+    <TR><TD ALIGN="LEFT">- - &#9655; realization</TD></TR><TR><TD ALIGN="LEFT">&#8212;&gt; serving</TD></TR><TR><TD ALIGN="LEFT">&#9679;&#8212;&#9654; assignment</TD></TR>
+    <TR><TD ALIGN="LEFT">&#183; &#183; &gt; access</TD></TR><TR><TD ALIGN="LEFT">&#9670;&#8212; composition</TD></TR></TABLE>>];
+}

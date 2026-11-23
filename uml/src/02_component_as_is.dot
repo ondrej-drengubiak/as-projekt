@@ -1,0 +1,51 @@
+digraph G {
+  graph [rankdir=LR, fontname="DejaVu Sans", fontsize=14, labelloc=t, nodesep=0.3, ranksep=0.7, splines=true, pad=0.2];
+  node [fontname="DejaVu Sans", fontsize=13];
+  edge [fontname="DejaVu Sans", fontsize=9];
+
+  subgraph cluster_mono {
+    label="«component» Legacy monolit"; style="rounded"; color="#555555"; fontsize=12;
+    node [shape=component, style=filled, fillcolor="#FFFFE0", color="#8B0000"];
+    customers; catalog; inventory; orders; payments; notifications; reporting;
+  }
+  subgraph cluster_db {
+    label="«datastore» monolith.db (zdieľaná databáza)"; style="rounded"; color="#555555"; fontsize=12;
+    node [shape=cylinder, style=filled, fillcolor="#EEEEEE", color="#444444"];
+    t_customers [label="customers"]; t_products [label="products"]; t_stock [label="stock"];
+    t_orders [label="orders"]; t_items [label="order_items"]; t_payments [label="payments"]; t_notif [label="notifications"];
+  }
+
+  // závislosti medzi modulmi (UML Usage dependency)
+  edge [style=dashed, arrowhead=open, color="#444444"];
+  orders -> customers; orders -> catalog; orders -> inventory; orders -> payments; orders -> notifications;
+  notifications -> customers;
+  // cyklické závislosti
+  edge [color="#C00000", penwidth=1.8, style=solid, arrowhead=open];
+  customers -> payments [xlabel="cyklus"];
+  payments -> customers;
+  catalog -> inventory [xlabel="cyklus"];
+  inventory -> catalog;
+
+  // prístup k tabuľkám
+  edge [penwidth=1.0, style=dotted, arrowhead=vee, color="#777777", fontcolor="#555555"];
+  catalog -> t_products [label="R"];
+  customers -> t_customers [label="RW"];
+  inventory -> t_stock [label="RW"];
+  notifications -> t_notif [label="RW"];
+  orders -> t_orders [label="RW"];
+  orders -> t_items [label="RW"];
+  payments -> t_payments [label="W"];
+  // cudzie tabuľky
+  edge [color="#C00000", fontcolor="#C00000", penwidth=1.6];
+  payments -> t_customers [label="W (cudzia)"];
+  reporting -> t_orders [label="R (cudzia)"];
+  reporting -> t_items [label="R (cudzia)"];
+  reporting -> t_products [label="R (cudzia)"];
+
+  legend [shape=plaintext, label=<<TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4">
+    <TR><TD ALIGN="LEFT"><FONT COLOR="#444444">- - &gt;</FONT> závislosť modulu (volanie funkcie)</TD></TR>
+    <TR><TD ALIGN="LEFT"><FONT COLOR="#C00000"><B>&#9472;&#9472;&gt;</B></FONT> cyklická závislosť modulov</TD></TR>
+    <TR><TD ALIGN="LEFT"><FONT COLOR="#777777">&#183; &#183; &#183;&gt;</FONT> prístup k vlastnej tabuľke (R čítanie, W zápis)</TD></TR>
+    <TR><TD ALIGN="LEFT"><FONT COLOR="#C00000">&#183; &#183; &#183;&gt;</FONT> prístup k cudzej tabuľke</TD></TR></TABLE>>, fontsize=10];
+  {rank=sink; legend}
+}

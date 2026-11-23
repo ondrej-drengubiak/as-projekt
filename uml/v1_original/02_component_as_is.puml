@@ -1,0 +1,49 @@
+@startuml
+title Komponentový diagram – AS-IS legacy monolit (generované statickou analýzou)
+skinparam componentStyle uml2
+skinparam shadowing false
+left to right direction
+package "Legacy monolit" {
+  component [customers] as customers
+  component [catalog] as catalog
+  component [inventory] as inventory
+  component [orders] as orders
+  component [payments] as payments
+  component [notifications] as notifications
+  component [reporting] as reporting
+}
+package "Zdieľaná DB (monolith.db)" {
+  database "customers" as t_customers
+  database "products" as t_products
+  database "stock" as t_stock
+  database "orders" as t_orders
+  database "order_items" as t_order_items
+  database "payments" as t_payments
+  database "notifications" as t_notifications
+}
+customers -[#CC0000]-> payments
+catalog -[#CC0000]-> inventory
+inventory -[#CC0000]-> catalog
+orders -[#444444]-> catalog
+orders -[#444444]-> payments
+orders -[#444444]-> notifications
+orders -[#444444]-> inventory
+orders -[#444444]-> customers
+payments -[#CC0000]-> customers
+notifications -[#444444]-> customers
+catalog .[#999999].> t_products : R
+customers .[#999999].> t_customers : RW
+inventory .[#999999].> t_stock : RW
+notifications .[#999999].> t_notifications : RW
+orders .[#999999].> t_order_items : RW
+orders .[#999999].> t_orders : RW
+payments .[#CC0000].> t_customers : W
+payments .[#999999].> t_payments : W
+reporting .[#CC0000].> t_order_items : R
+reporting .[#CC0000].> t_orders : R
+reporting .[#CC0000].> t_products : R
+legend right
+  červená plná = cyklická závislosť modulov
+  červená bodkovaná = prístup k cudzej tabuľke
+endlegend
+@enduml

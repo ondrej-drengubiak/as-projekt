@@ -1,0 +1,23 @@
+stateDiagram-v2
+  direction TB
+  state "zadanie objednávky (paralelné regióny)" as FLOW {
+    state "Objednávka (Order)" as ORDER {
+      [*] --> PENDING : place order / INSERT
+      PENDING --> PAID : platba OK [commit OK] / UPDATE PAID
+      PENDING --> CANCELLED : výnimka [COMPENSATE=1] / release, CANCELLED
+      PAID --> [*]
+      CANCELLED --> [*]
+    }
+    --
+    state "Rezervácia zásob (položka)" as RES {
+      [*] --> RESERVED : reserve
+      RESERVED --> COMMITTED : commit
+      RESERVED --> RELEASED : release
+      COMMITTED --> [*]
+      RELEASED --> [*]
+    }
+  }
+  note right of PENDING
+    COMPENSATE=0: objednávka ostane v PENDING
+    a rezervácia v RESERVED navždy (E4)
+  end note

@@ -1,0 +1,46 @@
+@startuml
+title Nasadzovací diagram – etapa S4 (procesy a databázy)
+skinparam shadowing false
+node "Klient" as client
+node "Hostiteľ (docker-compose / localhost)" {
+  node "gateway :8000" as gw {
+    artifact "gateway.app"
+  }
+  node "monolith :8001" as mono {
+    artifact "monolith.app (customers, notifications)"
+  }
+  node "catalog :8101" as cat {
+    artifact "services.catalog.app"
+  }
+  node "inventory :8102" as inv {
+    artifact "services.inventory.app"
+  }
+  node "billing :8103" as bil {
+    artifact "services.billing.app"
+  }
+  node "ordering :8104" as ord {
+    artifact "services.ordering.app"
+  }
+  database "monolith.db" as d0
+  database "catalog.db" as d1
+  database "inventory.db" as d2
+  database "billing.db" as d3
+  database "ordering.db" as d4
+}
+client --> gw : HTTP/JSON
+gw --> mono
+gw --> cat
+gw --> inv
+gw --> ord
+ord --> cat
+ord --> inv
+ord --> bil
+ord --> mono
+cat --> inv
+mono --> bil
+mono -- d0
+cat -- d1
+inv -- d2
+bil -- d3
+ord -- d4
+@enduml

@@ -1,0 +1,35 @@
+@startuml
+title Sekvenčný diagram – zadanie objednávky AS-IS (monolit, jedna ACID transakcia)
+skinparam shadowing false
+actor Klient
+participant "Monolit\n(orders)" as O
+participant customers
+participant catalog
+participant inventory
+participant payments
+participant notifications
+database "monolith.db" as DB
+
+Klient -> O : POST /orders
+O -> customers : get(customerId)
+O -> catalog : get_product(pid)
+O -> DB : BEGIN IMMEDIATE
+O -> DB : INSERT orders (PENDING)
+loop pre každú položku
+  O -> inventory : reserve(pid, qty)
+  inventory -> DB : UPDATE stock (reserved+=qty)
+end
+O -> payments : charge(orderId, amount)
+payments -> DB : UPDATE customers (credit_used), INSERT payments
+alt platba úspešná
+  O -> inventory : commit(pid, qty)
+  O -> DB : UPDATE orders SET PAID
+  O -> DB : COMMIT
+  O -> notifications : send(orderId)
+  O --> Klient : 201 Created
+else výnimka (zamietnutie, nedostupnosť, sklad)
+  O -> DB : ROLLBACK
+  note right: rollback automaticky\nzruší aj rezervácie
+  O --> Klient : 402 / 409 / 503
+end
+@enduml
